@@ -26,28 +26,28 @@ def vis_parsing_maps(im, parsing_anno, stride, save_im=False, save_path='vis_res
                    [255, 0, 255], [255, 85, 255], [255, 170, 255],
                    [0, 255, 255], [85, 255, 255], [170, 255, 255]]
 
-    im = np.array(im)
-    vis_im = im.copy().astype(np.uint8)
-    vis_parsing_anno = parsing_anno.copy().astype(np.uint8)
-    vis_parsing_anno = cv2.resize(vis_parsing_anno, None, fx=stride, fy=stride, interpolation=cv2.INTER_NEAREST)
-    vis_parsing_anno_color = np.zeros((vis_parsing_anno.shape[0], vis_parsing_anno.shape[1], 3)) + 255
+im = np.array(im)
+vis_im = im.copy().astype(np.uint8)
+vis_parsing_anno = parsing_anno.copy().astype(np.uint8)
+vis_parsing_anno = cv2.resize(vis_parsing_anno, None, fx=stride, fy=stride, interpolation=cv2.INTER_NEAREST)
+vis_parsing_anno_color = np.zeros((vis_parsing_anno.shape[0], vis_parsing_anno.shape[1], 3)) + 255
 
-    num_of_class = np.max(vis_parsing_anno)
+num_of_class = np.max(vis_parsing_anno)
 
-    for pi in range(1, num_of_class + 1):
-        index = np.where(vis_parsing_anno == pi)
-        vis_parsing_anno_color[index[0], index[1], :] = part_colors[pi]
+for pi in range(1, num_of_class + 1):
+    index = np.where(vis_parsing_anno == pi)
+    vis_parsing_anno_color[index[0], index[1], :] = part_colors[pi]
 
-    vis_parsing_anno_color = vis_parsing_anno_color.astype(np.uint8)
-    # print(vis_parsing_anno_color.shape, vis_im.shape)
-    vis_im = cv2.addWeighted(cv2.cvtColor(vis_im, cv2.COLOR_RGB2BGR), 0.4, vis_parsing_anno_color, 0.6, 0)
+vis_parsing_anno_color = vis_parsing_anno_color.astype(np.uint8)
+# print(vis_parsing_anno_color.shape, vis_im.shape)
+ vis_im = cv2.addWeighted(cv2.cvtColor(vis_im, cv2.COLOR_RGB2BGR), 0.4, vis_parsing_anno_color, 0.6, 0)
 
-    # Save result or not
-    if save_im:
-        cv2.imwrite(save_path[:-4] + '.png', vis_parsing_anno)
-        cv2.imwrite(save_path, vis_im, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+# Save result or not
+if save_im:
+    cv2.imwrite(save_path[:-4] + '.png', vis_parsing_anno)
+    cv2.imwrite(save_path, vis_im, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
 
-    return vis_im
+return vis_im
 
 
 
@@ -57,20 +57,20 @@ def evaluate(respth='./res/test_res', dspth='./data', cp='model_final_diss.pth')
     if not os.path.exists(respth):
         os.makedirs(respth)
 
-    # 初始化模型
-    n_classes = 19
-    net = BiSeNet(n_classes=n_classes)
-    save_pth = osp.join('model', cp)
-    # 加载模型权重
-    net.load_state_dict(torch.load(save_pth, map_location=torch.device('cpu')))
-    # 设置模型为评估模式
-    net.eval()
+# 初始化模型
+n_classes = 19
+net = BiSeNet(n_classes=n_classes)
+save_pth = osp.join('model', cp)
+# 加载模型权重
+net.load_state_dict(torch.load(save_pth, map_location=torch.device('cpu')))
+# 设置模型为评估模式
+net.eval()
 
-    # 定义图像预处理操作
-    to_tensor = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-    ])
+# 定义图像预处理操作
+to_tensor = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+])
 
   # 对指定目录下的每一张图像进行分割，并保存结果
   with torch.no_grad():
